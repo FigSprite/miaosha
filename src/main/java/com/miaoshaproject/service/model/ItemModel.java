@@ -33,6 +33,10 @@ public class ItemModel {
     @NotNull(message = "商品图片不能为空")
     private String imgUrl;
 
+    //如果不为空说明其拥有还未结束的秒杀活动
+    private PromoModel promoModel;
+
+
     public Integer getId() {
         return id;
     }
@@ -87,5 +91,27 @@ public class ItemModel {
 
     public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
+    }
+
+
+    public PromoModel getPromoModel() {
+        return promoModel;
+    }
+
+    public void setPromoModel(PromoModel promoModel) {
+        this.promoModel = promoModel;
+    }
+
+    @Override
+    public String toString() {
+        return "ItemModel{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", price=" + price +
+                ", stock=" + stock +
+                ", description='" + description + '\'' +
+                ", sales=" + sales +
+                ", imgUrl='" + imgUrl + '\'' +
+                '}';
     }
 }

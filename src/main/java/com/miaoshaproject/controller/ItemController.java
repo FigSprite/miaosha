@@ -5,15 +5,17 @@ import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.response.CommonReturnType;
 import com.miaoshaproject.service.IItemService;
 import com.miaoshaproject.service.model.ItemModel;
+import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.zip.DataFormatException;
 
 @Controller
 @RequestMapping("/item/")
@@ -24,7 +26,7 @@ public class ItemController extends BaseController{
     private IItemService iItemService;
 
     //创建商品
-    @RequestMapping("create_item")
+    @RequestMapping(value = "create_item",method = {RequestMethod.POST},consumes={CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType createItem(@RequestParam(name = "title")String title,
                                        @RequestParam(name = "description")String description,
@@ -45,6 +47,31 @@ public class ItemController extends BaseController{
         return CommonReturnType.create(itemVO);
     }
 
+    //商品详情页浏览
+    @RequestMapping(value = "get_item",method = {RequestMethod.GET})
+    @ResponseBody
+    public CommonReturnType getItem(@RequestParam(name = "id")Integer id){
+        ItemModel itemModel = iItemService.getItemById(id);
+
+        ItemVO itemVO = this.convertItemVOFromItemModel(itemModel);
+
+        return CommonReturnType.create(itemVO);
+    }
+
+    //商品列表页面浏览
+    @RequestMapping(value = "list",method = {RequestMethod.GET})
+    @ResponseBody
+    public CommonReturnType getList(){
+        List<ItemModel> itemModelList = iItemService.listItem();
+
+        List<ItemVO> itemVOList = itemModelList.stream().map(itemModel -> {
+            ItemVO itemVO = this.convertItemVOFromItemModel(itemModel);
+            return itemVO;
+        }).collect(Collectors.toList());
+
+        return CommonReturnType.create(itemVOList);
+    }
+
     /*
     *模型轉換
      */
@@ -55,6 +82,18 @@ public class ItemController extends BaseController{
         }
         ItemVO itemVO = new ItemVO();
         BeanUtils.copyProperties(itemModel,itemVO);
+        System.out.println(itemModel);
+        if(itemModel.getPromoModel()!=null){
+
+            itemVO.setPromoStatus(itemModel.getPromoModel().getStatus());
+            itemVO.setPromoId(itemModel.getPromoModel().getId());
+            itemVO.setPromoPrice(itemModel.getPromoModel().getPromoPrice());
+            itemVO.setStartDate(itemModel.getPromoModel().getStartTime().toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")));
+        }else {
+            itemVO.setPromoStatus(0);
+        }
+
+
         return itemVO;
     }
 }

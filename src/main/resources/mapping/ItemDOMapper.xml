@@ -12,7 +12,7 @@
   <sql id="Base_Column_List">
     id, title, price, description, sales, img_url
   </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap" >
     select 
     <include refid="Base_Column_List" />
     from item
@@ -30,7 +30,7 @@
       #{description,jdbcType=VARCHAR}, #{sales,jdbcType=INTEGER}, #{imgUrl,jdbcType=VARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.miaoshaproject.dataobject.ItemDO">
+  <insert id="insertSelective" parameterType="com.miaoshaproject.dataobject.ItemDO" useGeneratedKeys="true" keyProperty="id">
     insert into item
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -102,5 +102,18 @@
       sales = #{sales,jdbcType=INTEGER},
       img_url = #{imgUrl,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectItemDOList" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from item
+    order by sales desc ;
+  </select>
+
+  <update id="increaseSales" parameterType="map">
+    update item
+    set sales = sales + #{amount}
+    where id = #{itemId}
   </update>
 </mapper>

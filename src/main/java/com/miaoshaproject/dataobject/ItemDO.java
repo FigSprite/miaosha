@@ -62,4 +62,16 @@ public class ItemDO {
     public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl == null ? null : imgUrl.trim();
     }
+
+    @Override
+    public String toString() {
+        return "ItemDO{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", price=" + price +
+                ", description='" + description + '\'' +
+                ", sales=" + sales +
+                ", imgUrl='" + imgUrl + '\'' +
+                '}';
+    }
 }
