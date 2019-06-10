@@ -25,7 +25,7 @@
     values (#{id,jdbcType=INTEGER}, #{stock,jdbcType=INTEGER}, #{itemId,jdbcType=INTEGER}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.miaoshaproject.dataobject.ItemStockDO">
+  <insert id="insertSelective" parameterType="com.miaoshaproject.dataobject.ItemStockDO"  useGeneratedKeys="true" keyProperty="id">
     insert into item_stock
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">

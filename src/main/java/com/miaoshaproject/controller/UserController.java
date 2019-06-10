@@ -20,9 +20,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
-@Controller()
+@Controller("/user")
 @RequestMapping("/user/")
-@CrossOrigin(allowCredentials = "true",allowedHeaders = "*")
+@CrossOrigin(origins = {"*"},allowCredentials = "true")
 //没有办法做到session共享，所以要加上一些参数
 
 public class UserController extends BaseController{
@@ -136,7 +136,10 @@ public class UserController extends BaseController{
         //将登入凭证加入到用户登入成功的session
         this.httpServletRequest.getSession().setAttribute("IS_LOGIN",true);
         this.httpServletRequest.getSession().setAttribute("LOGIN_USER",userModel);
-
+        System.out.println("===UserController  login===");
+        System.out.println(httpServletRequest.getSession().getAttribute("IS_LOGIN")+"   =======");
+        System.out.println(httpServletRequest.getSession().getAttribute("LOGIN_USER")+"   =======");
+        System.out.println("======================");
         return CommonReturnType.create(null);
     }
 

@@ -95,9 +95,7 @@ public class OrderServiceImpl implements IOrderService {
         //主键没有设计成自增
         //生成交易流水号
         String no = generateOrderNo();
-        //System.out.println(no);
         orderModel.setId(no);
-       //System.out.println(orderModel);
         OrderInfoDO orderInfoDO = this.convertOrderInfoDOFromOrderModel(orderModel);
         orderInfoDOMapper.insertSelective(orderInfoDO);
 
@@ -106,11 +104,6 @@ public class OrderServiceImpl implements IOrderService {
 
     }
 
-    public static void main(String[] args) {
-        LocalDateTime now = LocalDateTime.now();
-        now.format(DateTimeFormatter.ISO_DATE);
-        System.out.println(now.format(DateTimeFormatter.ISO_DATE).replace("-",""));
-    }
     /*
     模型转换
      */
@@ -126,7 +119,6 @@ public class OrderServiceImpl implements IOrderService {
         //获取当前sequence
         int sequence = 0;
         SequenceInfoDO sequenceInfoDO =  sequenceInfoDOMapper.getSequenceByName("order_info");
-        System.out.println(sequenceInfoDO);
         sequence = sequenceInfoDO.getCurrentValue();
         sequenceInfoDO.setCurrentValue(sequenceInfoDO.getCurrentValue()+sequenceInfoDO.getStep());
         sequenceInfoDOMapper.updateByPrimaryKeySelective(sequenceInfoDO);

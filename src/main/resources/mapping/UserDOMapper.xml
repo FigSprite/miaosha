@@ -23,7 +23,7 @@
     delete from user_info
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.miaoshaproject.dataobject.UserDO">
+  <insert id="insert" parameterType="com.miaoshaproject.dataobject.UserDO" useGeneratedKeys="true" keyProperty="id">
     insert into user_info (id, name, gender, 
       age, telphone, register_mode, 
       thrid_party_id)
@@ -31,7 +31,7 @@
       #{age,jdbcType=INTEGER}, #{telphone,jdbcType=VARCHAR}, #{registerMode,jdbcType=VARCHAR}, 
       #{thridPartyId,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.miaoshaproject.dataobject.UserDO">
+  <insert id="insertSelective" parameterType="com.miaoshaproject.dataobject.UserDO" useGeneratedKeys="true" keyProperty="id">
     insert into user_info
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">

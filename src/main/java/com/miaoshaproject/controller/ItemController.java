@@ -11,17 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 
-@Controller
+@Controller("/item")
 @RequestMapping("/item/")
-@CrossOrigin(allowCredentials = "true",allowedHeaders = "*")
+@CrossOrigin(origins = {"*"},allowCredentials = "true")
 public class ItemController extends BaseController{
-
     @Autowired
     private IItemService iItemService;
 
@@ -61,14 +61,14 @@ public class ItemController extends BaseController{
     //商品列表页面浏览
     @RequestMapping(value = "list",method = {RequestMethod.GET})
     @ResponseBody
-    public CommonReturnType getList(){
+    public CommonReturnType getList( HttpSession httpSession){
         List<ItemModel> itemModelList = iItemService.listItem();
 
         List<ItemVO> itemVOList = itemModelList.stream().map(itemModel -> {
             ItemVO itemVO = this.convertItemVOFromItemModel(itemModel);
             return itemVO;
         }).collect(Collectors.toList());
-
+        System.out.println(httpSession.getAttribute("IS_LOGIN"));
         return CommonReturnType.create(itemVOList);
     }
 
@@ -82,7 +82,7 @@ public class ItemController extends BaseController{
         }
         ItemVO itemVO = new ItemVO();
         BeanUtils.copyProperties(itemModel,itemVO);
-        System.out.println(itemModel);
+
         if(itemModel.getPromoModel()!=null){
 
             itemVO.setPromoStatus(itemModel.getPromoModel().getStatus());

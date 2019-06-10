@@ -4,8 +4,9 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
-public class UserModel {
+public class UserModel implements Serializable {
     private Integer id;
 
     //不能null或者空字符串

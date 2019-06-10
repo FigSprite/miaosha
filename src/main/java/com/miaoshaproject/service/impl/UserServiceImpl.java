@@ -71,7 +71,7 @@ public class UserServiceImpl implements IUserService {
         if (userModel == null) {
             throw new BusinessException(EnmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
-        //System.out.println(userModel);
+
         //参数校验
         if (StringUtils.isEmpty(userModel.getName()) ||
                 userModel.getGender() == null ||
@@ -89,9 +89,11 @@ public class UserServiceImpl implements IUserService {
             throw new BusinessException(EnmBusinessError.PARAMETER_VALIDATION_ERROR, "手机号已重复");
         }
         userModel.setId(userDO.getId());
+        System.out.println(userModel);
+
 
         UserPasswordDO userPasswordDO = convertPasswordFromUserModel(userModel);
-        //System.out.println(userPasswordDO);
+        System.out.println(userPasswordDO);
         userPasswordDOMapper.insertSelective(userPasswordDO);
 
 

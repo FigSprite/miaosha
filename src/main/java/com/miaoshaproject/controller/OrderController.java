@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-@Controller()
+@Controller("/order")
 @RequestMapping("/order/")
-@CrossOrigin(allowCredentials = "true",allowedHeaders = "*")
+@CrossOrigin(origins = {"*"},allowCredentials = "true")
 public class OrderController extends BaseController {
     @Autowired
     private IOrderService iOrderService;
@@ -32,6 +32,7 @@ public class OrderController extends BaseController {
         //获取用户登入信息
 
         Boolean isLogin = (Boolean) httpServletRequest.getSession().getAttribute("IS_LOGIN");
+
         if(isLogin==null||!isLogin.booleanValue()){
           throw new BusinessException(EnmBusinessError.USER_NOT_LOGIN,"用户未登入");
         }

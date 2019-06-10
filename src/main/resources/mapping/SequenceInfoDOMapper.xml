@@ -25,13 +25,13 @@
     delete from sequence_info
     where name = #{name,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.miaoshaproject.dataobject.SequenceInfoDO">
+  <insert id="insert" parameterType="com.miaoshaproject.dataobject.SequenceInfoDO"  useGeneratedKeys="true" keyProperty="id">
     insert into sequence_info (name, current_value, step
       )
     values (#{name,jdbcType=VARCHAR}, #{currentValue,jdbcType=INTEGER}, #{step,jdbcType=VARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.miaoshaproject.dataobject.SequenceInfoDO">
+  <insert id="insertSelective" parameterType="com.miaoshaproject.dataobject.SequenceInfoDO"  useGeneratedKeys="true" keyProperty="id">
     insert into sequence_info
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="name != null">

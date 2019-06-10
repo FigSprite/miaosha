@@ -23,7 +23,7 @@
     delete from order_info
     where id = #{id,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.miaoshaproject.dataobject.OrderInfoDO">
+  <insert id="insert" parameterType="com.miaoshaproject.dataobject.OrderInfoDO"  useGeneratedKeys="true" keyProperty="id">
     insert into order_info (id, user_id, item_id, 
       item_price, amount, order_price,promo_id
       )
@@ -31,7 +31,7 @@
       #{itemPrice,jdbcType=DECIMAL}, #{amount,jdbcType=INTEGER}, #{orderPrice,jdbcType=DECIMAL}, #{promoId,jdbcType=INTEGER}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.miaoshaproject.dataobject.OrderInfoDO">
+  <insert id="insertSelective" parameterType="com.miaoshaproject.dataobject.OrderInfoDO"  useGeneratedKeys="true" keyProperty="id">
     insert into order_info
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">

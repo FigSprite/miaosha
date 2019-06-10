@@ -52,14 +52,12 @@ public class ItemServiceImpl implements IItemService {
         if(result.isHasErrors()){
             throw new BusinessException(EnmBusinessError.PARAMETER_VALIDATION_ERROR,result.getErrMsg());
         }
-        //System.out.println("itemModel:  "+itemModel);
         ItemDO itemDO = this.convertItemDOFromItemModel(itemModel);
-        //System.out.println("itemDO:   "+itemDO);
+
 
 
         itemDOMapper.insertSelective(itemDO);
         itemModel.setId(itemDO.getId());
-        //System.out.println("itemModel:  "+itemModel);
         ItemStockDO itemStockDO = this.convertItemStockFromItemModel(itemModel);
 
 
@@ -96,6 +94,7 @@ public class ItemServiceImpl implements IItemService {
             itemModel.setPromoModel(promoModel);
         }
 
+
         return itemModel;
     }
 
@@ -121,15 +120,13 @@ public class ItemServiceImpl implements IItemService {
      */
     //ItemModel-->ItemDO
     private ItemDO convertItemDOFromItemModel(ItemModel itemModel){
-        //System.out.println("转换方法中的itemModel:  "+itemModel);
+
         if(itemModel==null){
             return null;
         }
         ItemDO itemDO = new ItemDO();
         BeanUtils.copyProperties(itemModel,itemDO);
-        //System.out.println("****");
-        //System.out.println(itemDO);
-        //System.out.println("****");
+
         return itemDO;
     }
     //ItemModel-->ItemStockDO
