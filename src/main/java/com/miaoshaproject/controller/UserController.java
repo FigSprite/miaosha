@@ -10,6 +10,7 @@ import com.miaoshaproject.service.model.UserModel;
 import org.apache.tomcat.util.security.MD5Encoder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Controller("/user")
 @RequestMapping("/user/")
@@ -33,6 +36,9 @@ public class UserController extends BaseController{
     //通过Spring
     @Autowired
     private HttpServletRequest httpServletRequest;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     //用户注册接口
     @RequestMapping(value="register",method = {RequestMethod.POST},consumes={CONTENT_TYPE_FORMED})
@@ -133,14 +139,15 @@ public class UserController extends BaseController{
         //用户登入Service
         UserModel userModel = iUserService.validateLogin(telephone,this.EncodeByMd5(password));
 
-        //将登入凭证加入到用户登入成功的session
-        this.httpServletRequest.getSession().setAttribute("IS_LOGIN",true);
-        this.httpServletRequest.getSession().setAttribute("LOGIN_USER",userModel);
-        System.out.println("===UserController  login===");
-        System.out.println(httpServletRequest.getSession().getAttribute("IS_LOGIN")+"   =======");
-        System.out.println(httpServletRequest.getSession().getAttribute("LOGIN_USER")+"   =======");
-        System.out.println("======================");
-        return CommonReturnType.create(null);
+        //生成登入凭证
+        String uuidToken = UUID.randomUUID().toString();
+        uuidToken=uuidToken.replace("-","");
+        //建立联系
+        redisTemplate.opsForValue().set(uuidToken,userModel);
+        redisTemplate.expire(uuidToken,1, TimeUnit.HOURS);
+        //this.httpServletRequest.getSession().setAttribute("IS_LOGIN",true);
+        //this.httpServletRequest.getSession().setAttribute("LOGIN_USER",userModel);
+        return CommonReturnType.create(uuidToken);
     }
 
 }

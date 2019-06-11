@@ -68,7 +68,6 @@ public class ItemController extends BaseController{
             ItemVO itemVO = this.convertItemVOFromItemModel(itemModel);
             return itemVO;
         }).collect(Collectors.toList());
-        System.out.println(httpSession.getAttribute("IS_LOGIN"));
         return CommonReturnType.create(itemVOList);
     }
 
