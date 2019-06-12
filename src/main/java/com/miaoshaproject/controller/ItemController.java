@@ -3,6 +3,7 @@ package com.miaoshaproject.controller;
 import com.miaoshaproject.controller.viewobject.ItemVO;
 import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.response.CommonReturnType;
+import com.miaoshaproject.service.ICacheService;
 import com.miaoshaproject.service.IItemService;
 import com.miaoshaproject.service.model.ItemModel;
 import org.joda.time.format.DateTimeFormat;
@@ -22,22 +23,25 @@ import java.util.zip.DataFormatException;
 
 @Controller("/item")
 @RequestMapping("/item/")
-@CrossOrigin(origins = {"*"},allowCredentials = "true")
-public class ItemController extends BaseController{
+@CrossOrigin(origins = {"*"}, allowCredentials = "true")
+public class ItemController extends BaseController {
     @Autowired
     private IItemService iItemService;
 
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private ICacheService iCacheService;
+
     //创建商品
-    @RequestMapping(value = "create_item",method = {RequestMethod.POST},consumes={CONTENT_TYPE_FORMED})
+    @RequestMapping(value = "create_item", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
-    public CommonReturnType createItem(@RequestParam(name = "title")String title,
-                                       @RequestParam(name = "description")String description,
-                                       @RequestParam(name = "price")BigDecimal price,
-                                       @RequestParam(name = "stock")Integer stock,
-                                       @RequestParam(name = "imgUrl")String imgUrl) throws BusinessException {
+    public CommonReturnType createItem(@RequestParam(name = "title") String title,
+                                       @RequestParam(name = "description") String description,
+                                       @RequestParam(name = "price") BigDecimal price,
+                                       @RequestParam(name = "stock") Integer stock,
+                                       @RequestParam(name = "imgUrl") String imgUrl) throws BusinessException {
         ItemModel itemModel = new ItemModel();
         itemModel.setTitle(title);
         itemModel.setDescription(description);
@@ -53,20 +57,26 @@ public class ItemController extends BaseController{
     }
 
     //商品详情页浏览
-    @RequestMapping(value = "get_item",method = {RequestMethod.GET})
+    @RequestMapping(value = "get_item", method = {RequestMethod.GET})
     @ResponseBody
-    public CommonReturnType getItem(@RequestParam(name = "id")Integer id){
-        //根据商品id区redis内获取
+    public CommonReturnType getItem(@RequestParam(name = "id") Integer id) {
 
-        ItemModel itemModel = (ItemModel) redisTemplate.opsForValue().get("item_"+id);
+        ItemModel itemModel = (ItemModel) iCacheService.getFromCommonCache("item_" + id);
+        if (itemModel == null) {
+            //根据商品id区redis内获取
 
-        //redis里不含对应itemModel，则访问下游Service
-        if(itemModel==null){
-            System.out.println("*******");
-            itemModel = iItemService.getItemById(id);
-            redisTemplate.opsForValue().set("item_"+id,itemModel);
-            redisTemplate.expire("item_"+id,10, TimeUnit.MINUTES);
+            itemModel = (ItemModel) redisTemplate.opsForValue().get("item_" + id);
+
+            //redis里不含对应itemModel，则访问下游Service
+            if (itemModel == null) {
+                itemModel = iItemService.getItemById(id);
+                redisTemplate.opsForValue().set("item_" + id, itemModel);
+                redisTemplate.expire("item_" + id, 10, TimeUnit.MINUTES);
+            }
+
+            iCacheService.setCommonCache("item_" + id, itemModel);
         }
+
 
         ItemVO itemVO = this.convertItemVOFromItemModel(itemModel);
 
@@ -74,9 +84,9 @@ public class ItemController extends BaseController{
     }
 
     //商品列表页面浏览
-    @RequestMapping(value = "list",method = {RequestMethod.GET})
+    @RequestMapping(value = "list", method = {RequestMethod.GET})
     @ResponseBody
-    public CommonReturnType getList( HttpSession httpSession){
+    public CommonReturnType getList(HttpSession httpSession) {
         List<ItemModel> itemModelList = iItemService.listItem();
 
         List<ItemVO> itemVOList = itemModelList.stream().map(itemModel -> {
@@ -87,23 +97,23 @@ public class ItemController extends BaseController{
     }
 
     /*
-    *模型轉換
+     *模型轉換
      */
 
-    public ItemVO convertItemVOFromItemModel(ItemModel itemModel){
-        if(itemModel==null){
+    public ItemVO convertItemVOFromItemModel(ItemModel itemModel) {
+        if (itemModel == null) {
             return null;
         }
         ItemVO itemVO = new ItemVO();
-        BeanUtils.copyProperties(itemModel,itemVO);
+        BeanUtils.copyProperties(itemModel, itemVO);
 
-        if(itemModel.getPromoModel()!=null){
+        if (itemModel.getPromoModel() != null) {
 
             itemVO.setPromoStatus(itemModel.getPromoModel().getStatus());
             itemVO.setPromoId(itemModel.getPromoModel().getId());
             itemVO.setPromoPrice(itemModel.getPromoModel().getPromoPrice());
             itemVO.setStartDate(itemModel.getPromoModel().getStartTime().toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")));
-        }else {
+        } else {
             itemVO.setPromoStatus(0);
         }
 
