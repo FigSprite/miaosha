@@ -8,6 +8,7 @@ import com.miaoshaproject.service.model.ItemModel;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 
@@ -24,6 +26,9 @@ import java.util.zip.DataFormatException;
 public class ItemController extends BaseController{
     @Autowired
     private IItemService iItemService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     //创建商品
     @RequestMapping(value = "create_item",method = {RequestMethod.POST},consumes={CONTENT_TYPE_FORMED})
@@ -51,7 +56,17 @@ public class ItemController extends BaseController{
     @RequestMapping(value = "get_item",method = {RequestMethod.GET})
     @ResponseBody
     public CommonReturnType getItem(@RequestParam(name = "id")Integer id){
-        ItemModel itemModel = iItemService.getItemById(id);
+        //根据商品id区redis内获取
+
+        ItemModel itemModel = (ItemModel) redisTemplate.opsForValue().get("item_"+id);
+
+        //redis里不含对应itemModel，则访问下游Service
+        if(itemModel==null){
+            System.out.println("*******");
+            itemModel = iItemService.getItemById(id);
+            redisTemplate.opsForValue().set("item_"+id,itemModel);
+            redisTemplate.expire("item_"+id,10, TimeUnit.MINUTES);
+        }
 
         ItemVO itemVO = this.convertItemVOFromItemModel(itemModel);
 
